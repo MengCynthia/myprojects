@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff">
+
+    <TableRow
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/symbol"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="Stock Symbol"
+            android:textColor="#000"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="123"
+            android:textColor="#000"
+            android:textSize="16dp" />
+        <TextView
+        android:id="@+id/change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="123"
+        android:textColor="#000"
+        android:textSize="16dp" />
+        <TextView
+            android:id="@+id/chapre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123"
+            android:textColor="#000"
+            android:textSize="16dp" />
+
+    </TableRow>
+
+</TableLayout>

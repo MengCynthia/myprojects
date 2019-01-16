@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="indicator">
+        <item>Price</item>
+        <item>SMA</item>
+        <item>EMA</item>
+        <item>STOCH</item>
+        <item>ADX</item>
+        <item>CCI</item>
+        <item>RSI</item>
+        <item>BBANDS</item>
+        <item>MACD</item>
+    </string-array>
+    <string-array name="delete">
+        <item>NO</item>
+        <item>YES</item>
+    </string-array>
+</resources>

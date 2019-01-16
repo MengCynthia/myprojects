@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title>chart</title>  
+   <script src="https://code.highcharts.com/highcharts.src.js"></script>
+   <script src="https://code.highcharts.com/stock/highstock.js"></script>
+   <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+   <script src="https://code.highcharts.com/modules/exporting.js"></script>
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script>
+
+  function test(a){
+     alert(a['price']["Meta Data"]["2. Symbol"]);
+     
+     document.getElementById("container").innerHTML=a['price']["Meta Data"]["2. Symbol"];
+ }
+
+
+  jsshowchar = function(localdata,indicator){
+    var resurl;
+     // alert(localdata['price']["Meta Data"]["2. Symbol"]+indicator);
+
+      var A = new Array();
+      var a = new Array();
+      var b = new Array();
+
+      A =  Object.keys(localdata['price']["Time Series (Daily)"]);
+      if(A.length<120){
+        for(var i = 0; i<A.length; i++){
+          a[i]=A[i];
+          b[i]=A.length-i;
+        }
+      }
+      else{
+        for(var i = 0; i<120; i++){
+        a[i]=A[i];
+        b[i]=120-i;
+        }
+      }
+
+      console.log("a:"+a);
+
+
+      Price = localdata['price'];
+      Symbol_ = Price["Meta Data"]["2. Symbol"];
+      VolumeLast = Price["Time Series (Daily)"][a[0]]["5. volume"];
+      Timestamptody =a[0];
+      DateCount = a.length;
+
+   
+      Price_ = new Array();
+      Pricestock = new Array();
+      Volume_ = new Array();
+   
+      for (var i=0; i<DateCount; i++) {
+       Price_[i]=parseFloat(Price["Time Series (Daily)"][a[i]]["4. close"]).toFixed(2);
+       Volume_[i]=Price["Time Series (Daily)"][a[i]]["5. volume"];
+      }
+    
+      
+   function changeDateFormat(inputDate){  // expects Y-m-d
+        var outputDate = new Array();
+       for (var i = 0; i < inputDate.length; i++) {
+        var tests=/:/;
+        var retests = new RegExp(tests);
+        var splitDate1 ="";
+        if(retests.test(inputDate[i])){
+       var splitDate1 = inputDate[i].split(' ',1);
+       //console.log(inputDate[i]+" "+splitDate1);
+        }else{
+          splitDate1 = inputDate[i];
+     }
+     //console.log("splitDate1"+splitDate1);
+       var splitDate = splitDate1.toString().split('-');
+
+       if(splitDate.count == 0){
+         return null;
+        }
+
+        var year = splitDate[0];
+        var month = splitDate[1];
+        var day = splitDate[2]; 
+        outputDate[i] = month + '\/' + day;
+
+        }
+        //console.log(outputDate);
+         return outputDate;
+
+        }
+
+   function changeTSFormat(inputDate){  // expects Y-m-d 
+       var splitDate = inputDate.split('-');
+       if(splitDate.count == 0){
+         return null;
+        }
+
+         var year = splitDate[0];
+         var month = splitDate[1];
+         var day = splitDate[2]; 
+          return month + '\/' + day + '\/' + year;
+
+         }
+
+  //  $("#b").click(testPOST);
+    
+    var exporturl = 'http://export.highcharts.com/';
+
+    function testPOST() {
+        console.log("1"+exporturl);
+        var optionsStr = JSON.stringify(chartdata),
+        dataString = encodeURI('async=true&type=jpeg&width=400&options=' + optionsStr);
+
+        if (window.XDomainRequest) {
+            var xdr = new XDomainRequest();
+            xdr.open("post", exportUrl+ '?' + dataString);
+            xdr.onload = function () {
+                console.log(xdr.responseText);
+                resurl = exporturl + xdr.responseText;
+                console.log("a+"+resurl);
+               // $('#container').html('<img src="' + exporturl + xdr.responseText + '"/>');
+            };
+            xdr.send();
+        } else {
+            $.ajax({
+                type: 'POST',
+                data: dataString,
+                url: exporturl,
+                success: function (data) {
+                    console.log('get the file from relative url: ', data);
+                    resurl = exporturl + data;
+                    console.log("b+"+resurl);
+
+                    window.control.getrul(resurl);
+
+                   // $('#container').html('<img src="' + exportUrl + data + '"/>');
+                },
+                error: function (err) {
+                    debugger;
+                    console.log('error', err.statusText)
+                }
+            });
+        }
+
+    }
+    
+
+  
+showChar = function(indicator){
+  console.log("indicator:"+indicator);
+  var jsonObj = localdata[indicator];
+
+  if (indicator == "Price"){
+
+
+     toDay_ = changeTSFormat(Timestamptody);
+     //console.log(date);
+     
+     var date_ = changeDateFormat(a);
+
+    Price_ =Price_.map(function(el){return parseFloat(el);});
+     console.log(Price_);
+
+    Volume_ =Volume_.map(function(el){return parseFloat(el);});
+     var maxVo = Math.max.apply(null,Volume_);
+     console.log(12);
+
+chartdata = {
+        chart: {
+          zoomType: 'xy',
+           width: 350,
+          height: (5 / 4 * 100) + '%'
+        },
+        title: {
+        text: 'Stock Price'+' '+ '('+ toDay_ + ')'
+        },
+        subtitle: {
+          useHTML:true,
+          text: 'Source: <a href="https://www.alphavantage.co/" target="_blank"> Alpha Vantage </a>',
+
+          style: {
+            color: "#2e62e6"
+          }
+        },
+        xAxis: [{
+         categories: b,
+          showLastLabel: true,
+          //crosshair: true,
+          tickInterval: 10,
+          reversed: true
+        }],
+        yAxis: [{ // Primary yAxis
+       // min:135,
+          tickAmount:4,
+        //tickInterval: 5,
+          labels: {
+            format: '{value}',
+          
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+          },
+          title: {
+            text: 'Stock Price',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+          }
+        },
+        
+        { // Secondary yAxis
+        //tickInterval: 50000000,
+        //max:maxVo*4,
+        tickAmount: 4,
+        title: {
+            text: 'Volume',
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        },
+        labels: {
+            //format: '{value}M',
+            formatter: function () {
+                return this.value / 1000000 + 'M';
+            },
+            style: {
+                color: Highcharts.getOptions().colors[1]
+            }
+        
+        },
+        opposite: true
+        }],
+        tooltip: {
+
+        //shared: true
+        },
+        legend: {
+           
+          //layout: 'vertical',
+          align: 'center',
+          //verticalAlign: 'middle',
+
+          backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+        },
+        tooltip: {
+            pointFormat:'<span style="color:{point.color}">\u25CF</span>'+'{series.name}'+':<b>{point.y:,..2f}<b><br />'
+        },   
+        series: [{
+          id:Symbol_,
+          name:Symbol_,
+          type: 'area',
+          //threshold: null,
+          data:Price_,
+
+          //lineColor: "#f80000",
+        
+          
+          color:"#1325f4",
+          fillOpacity: 0.3,
+          lineWidth:1,
+        
+        },
+     
+
+        {
+          id:Symbol_+' Volume',
+          name:Symbol_+' Volume',
+          type: 'column',
+          color: "#f80000",
+          yAxis: 1,
+          data:Volume_,
+          tooltip: {
+            valueSuffix: '',
+            pointFormat:'<span style="color:{point.color}">\u25CF</span>'+'{series.name}'+':<b>{point.y}<b><br />'
+          }
+
+        }]
+      }
+    Highcharts.chart('container', chartdata
+  
+      );//endchartconfig
+    console.log(12);
+
+    
+  }
+  else {
+    
+    var Title = jsonObj["Meta Data"]["2: Indicator"];
+    console.log("title:"+Title);
+    
+    var data2 = new Array();
+    var one;
+    for (one in jsonObj) {
+      //console.log(one);
+      if(one != "Meta Data"){
+       // console.log(one);
+       if(jsonObj[one]!=""){
+        
+        var keys = new Array();
+        for(var d in jsonObj[one]){
+          keys.push(d);
+        }
+      }
+        
+      }
+    }
+    var obkey = Object.keys(jsonObj[one]);
+    //console.log(obkey);
+    if(obkey.length==0){
+      document.getElementById('container').innerHTML="<tr><td>Error: No "+indicator+" Data!</td></tr>"
+      //return;
+    }
+    else{
+    
+        //console.log(keys);
+        var data1 =new Array();
+        //console.log(jsonObj[one][keys[0]]); 
+        var title1 = new Array();
+        for(var m in jsonObj[one][keys[0]]){
+          title1.push(m);
+        }
+        var key1s = new Array();
+        for(var p in jsonObj[one][keys[0]]){
+          
+            key1s.push(p);
+          }
+        //console.log(jsonObj[one][keys[0]].length);
+        var date1 = new Array();
+        for(var t = 0; t < title1.length; t++){
+         data1[t] = new Array();
+         for(var q = 0; q<DateCount-1; q++){ 
+          date1.push(keys[q]);
+          
+          
+            data1[t].push(parseFloat(jsonObj[one][keys[q]][key1s[t]]));
+          
+        }
+        //console.log(data1[t]);
+      }
+        //console.log(data1);
+        var date_1 = changeDateFormat(date1);
+        var Series_a = new Array();
+        if(title1.length==1){
+          var Series_o = new Object();
+
+          Series_o.id =Symbol_;
+          Series_o.name =Symbol_;
+          Series_o.data = data1[0];
+          Series_a[0]=Series_o;
+        }
+        else{
+        for(var t = 0; t < title1.length; t++){
+          var Series_o = new Object();
+          Series_o.id =Symbol_+" "+title1[t];
+          Series_o.name =Symbol_+" "+title1[t];
+          Series_o.data = data1[t];
+          Series_a[t]=Series_o;
+
+        }
+      }
+
+     
+    console.log("indicator1:"+indicator);
+
+    
+      chartdata = {
+    chart: {
+      zoomType: 'xy',
+      width: 350,
+          height: (5 / 4 * 100) + '%'
+    },
+    title: {
+        text: Title
+    },
+
+    subtitle: {
+      useHTML:true,
+        text: 'Source: <a href="https://www.alphavantage.co/" target="_blank"> Alpha Vantage </a>',
+        style: {
+                color: "#2e62e6"
+            }
+    },
+
+    xAxis: [{
+        categories: b,
+        //crosshair: true,
+        tickInterval: 10,
+        reversed: true
+        
+    }],
+    yAxis: {
+        title: {
+            text: indicator
+        },
+        //min:135,
+        ttickAmount:8,
+        labels: {
+            format: '{value}',
+        }
+        
+    },
+    legend: {
+        //layout: 'vertical',
+        align: 'center',
+       // verticalAlign: 'middle',
+    },
+    colors: ['#FF0000','#058DC7','#FF9655'],
+    plotOptions: {
+        series: {
+            marker: {
+                radius: 2
+            },
+            lineWidth: 1,
+            //lineColor: "#f80000",
+
+        }
+    },
+    series: Series_a,
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+        
+
+  }
+  Highcharts.chart('container', chartdata);
+    }}
+  console.log("indicator2:"+indicator);
+  
+  }//endofshow
+  showChar(indicator);
+  testPOST();
+  console.log("url"+resurl);
+ // function progressbar() {
+ //      window.control.progressbar(); 
+  // } 
+ //progressbar();
+return resurl;
+}
+ 
+</script>
+   </head>
+   <body>
+     <div id="container"  style="height:500px;min-width:300px">
+     </div>
+      
+   </body>
+</html>

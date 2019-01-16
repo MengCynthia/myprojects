@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">hw9-1</string>
+    <string name="title_activity_detail">detailActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_details">detailsActivity</string>
+    <string name="title_activity_stock">stockActivity</string>
+    <string name="tab_text_1">CURRENT</string>
+    <string name="tab_text_2">HISTORICAL</string>
+    <string name="tab_text_3">NEWS</string>
+    <string name="facebook_app_id">714116195445149</string>
+</resources>

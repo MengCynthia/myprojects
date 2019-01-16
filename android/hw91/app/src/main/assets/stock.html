@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title>stock</title>
+   <script src="https://code.highcharts.com/stock/highstock.js"></script>
+   <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+<script>
+
+ jsshowstock = function(Price){
+
+     var A = new Array();
+      a = new Array();
+      var b = new Array();
+      A =  Object.keys(Price["Time Series (Daily)"]);
+     
+      if(A.length<1000){
+        for(var i = 0; i<A.length; i++){
+          b[i]=A[i];
+        }
+      }
+      else{
+        for(var i = 0; i<1000; i++){
+         b[i]=A[i];
+        }
+      }
+
+      Symbol_ = Price["Meta Data"]["2. Symbol"];
+   
+      Pricestock = new Array();
+   
+
+      for (var i=0; i<b.length; i++) {
+       Pricestock[b.length-i-1]=new Array();
+       Pricestock[b.length-i-1][0]=Date.parse(b[i]);
+       Pricestock[b.length-i-1][1]= parseFloat(Price["Time Series (Daily)"][b[i]]["4. close"]);
+      }
+      //Pricestock =Pricestock.map(function(el){return parseFloat(el);});
+      console.log(Pricestock);
+
+
+
+  Highcharts.stockChart('container', {
+       chart: {
+         
+           width: 350,
+          height: (6 / 4 * 100) + '%'
+        },
+        rangeSelector: {
+            buttons: [
+            {
+             type: 'month',
+             count: 1,
+             text: '1m'
+            }, {
+             type: 'month',
+             count: 3,
+             text: '3m'
+            }, {
+             type: 'month',
+             count: 6,
+             text: '6m'
+            }, {
+             type: 'year',
+             count: 1,
+             text: '1y'
+            }, {
+             type: 'all',
+             text: 'All'
+            }],
+            selected: 0
+        },
+
+        title: {
+            text: Symbol_+' Stock Value'
+        },
+        subtitle: {
+         useHTML:true,
+         text: 'Source: <a href="https://www.alphavantage.co/" target="_blank"> Alpha Vantage </a>',
+         style: {
+                color: "#2e62e6"
+            }
+        },
+
+
+        series: [{
+            name: Symbol_,
+            type: 'area',
+            data: Pricestock,
+            tooltip: {
+                shared: true,
+                valueDecimals: 2
+            }
+        }]
+    });
+  return 1;
+
+ }
+ 
+</script>
+   </head>
+   <body>
+     <div id="container"  style="height:600px;min-width:300px">
+     </div>
+      
+   </body>
+</html>
